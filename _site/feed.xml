@@ -1,1 +1,144 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-08-02T17:04:24-04:00</updated><id>http://localhost:4000/</id><title type="html">Coming soon 👀</title><subtitle>:gbpsthink:</subtitle></feed>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Reversing Engineering for the Soul</title>
+    <description>Everything you've ever wanted to know about programs you've never heard of</description>
+    <link>http://ctf.re//</link>
+    <atom:link href="http://ctf.re//feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>Exploiting the Source Engine (Part 1)</title>
+        <description>&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;It’s been a long time coming, but here’s my first post on a series about finding and exploiting bugs in &lt;a href=&quot;https://en.wikipedia.org/wiki/Source_(game_engine)&quot;&gt;Valve Software’s Source Engine&lt;/a&gt;. I was first introduced to it through the sandbox game &lt;a href=&quot;https://store.steampowered.com/app/4000/Garrys_Mod/&quot;&gt;Garry’s Mod&lt;/a&gt; in 2010, which introduced me to the field of reverse engineering and paved the way for my favorite hobby, my education, and my eventual employment.&lt;/p&gt;
+
+&lt;p&gt;I took a long hiatus from working with the Source Engine when I went to college and got involved obsessed with playing &lt;a href=&quot;https://ctftime.org/ctf-wtf/&quot;&gt;CTF competitions&lt;/a&gt;, a type of competition where participants solve challenges that mimic real-world reverse engineering and exploitation tasks. One day, I saw a post made about a TF2 RCE proof-of-concept released against the engine. To be honest, the bug and the exploit was very simple, and nothing more difficult than some of the intermediate challenges one would find in a good CTF. With that knowledge under my belt, I decided to prove myself and come back to the Source Engine with the goal of finding a true &lt;a href=&quot;https://en.wikipedia.org/wiki/Arbitrary_code_execution&quot;&gt;Remote Code Execution&lt;/a&gt; (RCE).&lt;/p&gt;
+
+&lt;p&gt;As it turns out, this was around the time that &lt;a href=&quot;https://hackerone.com/valve&quot;&gt;Valve released their Bug Bounty program through HackerOne&lt;/a&gt;, where they boasted a bounty range of &lt;strong&gt;$1,000 - $25,000&lt;/strong&gt; for these kind of bugs. With a bit of luck, &lt;a href=&quot;https://hackerone.com/gbps&quot;&gt;I successfully found and wrote a proof-of-concept for a critical Server to Client RCE bug&lt;/a&gt;, and was given a generous bounty of &lt;strong&gt;$15,000&lt;/strong&gt; from Valve. Everything in this series is dedicated to information I’ve learned along the way about the engine.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;NOTE: As of writing, the vulnerability has not been publicly disclosed. I will be doing a writeup of the bug and exploit chain if/when it goes public.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;&lt;img src=&quot;/assets/image-20180802185147009.png&quot; alt=&quot;image-20180802185147009&quot; /&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;em&gt;Source games Dota 2, CS:GO, and TF2 continue to hold top active player counts on Steam&lt;/em&gt;.&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&quot;the-source-engine&quot;&gt;The Source Engine&lt;/h2&gt;
+
+&lt;p&gt;The Source Engine is a third generation derivative of the famous &lt;a href=&quot;https://en.wikipedia.org/wiki/Quake_engine&quot;&gt;Quake Engine&lt;/a&gt; from 1999 and the Valve’s own &lt;a href=&quot;https://en.wikipedia.org/wiki/GoldSrc&quot;&gt;GoldSrc&lt;/a&gt; engine (the HL1 engine). The engine itself has been used to create some of the most famous FPS game series’ in history, including Half-Life, Team Fortress, Portal, and Counter Strike.&lt;/p&gt;
+
+&lt;h3 id=&quot;timeline&quot;&gt;Timeline:&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1998 - Valve showcases &lt;strong&gt;GoldSrc&lt;/strong&gt;, a heavily modified Quake engine.&lt;/li&gt;
+  &lt;li&gt;2004 - Valve releases the &lt;strong&gt;Source Engine&lt;/strong&gt; based on GoldSrc.&lt;/li&gt;
+  &lt;li&gt;2007 - The source code to the &lt;a href=&quot;https://github.com/VSES/SourceEngine2007&quot;&gt;&lt;strong&gt;Source Engine is leaked&lt;/strong&gt;&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;2012 - CS:GO is released, and with it, &lt;strong&gt;“Source 1.5”&lt;/strong&gt; begins development.&lt;/li&gt;
+  &lt;li&gt;2013 - Valve releases the &lt;a href=&quot;https://github.com/ValveSoftware/source-sdk-2013&quot;&gt;&lt;strong&gt;public 2013 SDK for the TF2/CS:S engine&lt;/strong&gt;&lt;/a&gt; containing most of the code necessary to write games for the engine.&lt;/li&gt;
+  &lt;li&gt;2015 - The “Reborn” update for Dota 2 brings the first &lt;strong&gt;Source 2&lt;/strong&gt; game to market.&lt;/li&gt;
+  &lt;li&gt;2018 - Valve opens their HackerOne program to the public.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;the-code&quot;&gt;The Code:&lt;/h3&gt;
+
+&lt;p&gt;The first thing that I didn’t truly appreciate about this engine (and other engines in general) is how &lt;em&gt;large&lt;/em&gt; it is. The engine is gigantic, featuring millions of lines of C++ code to develop, render, and run games of all types (but mostly first-person games).&lt;/p&gt;
+
+&lt;p&gt;The code itself is old and unmaintained. Most of the code was very obviously rushed out to meet deadlines, and honestly it is a huge surprise that the engine even functions at all. This is not unique to Valve, and is very typical in the game development world.&lt;/p&gt;
+
+&lt;p&gt;Assets such as models, particles, and maps are all built and run using custom file formats developed by Valve or extended from Quake (yes, file format parsers from 1999). There are still usages of obviously unsafe functions such as &lt;code class=&quot;highlighter-rouge&quot;&gt;strcpy&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;sprintf&lt;/code&gt;, and in general the engine itself has a history of “add, add, add” and very little maintenance.&lt;/p&gt;
+
+&lt;p&gt;A lot of the C++ classes included in the engine are straight up dead code. Big features  were designed and developed, yet only used for very small parts of the engine. The 2013 SDK tools themselves still have difficulty building valid files for their current engine versions of the engine. Classes derive from anywhere from one to nine different base classes, and tend to feature a never-ending maze of abstractions on abstractions. All in all, the engine is due for a legacy code rewrite that will likely never happen.&lt;/p&gt;
+
+&lt;h3 id=&quot;intro-to-source-games&quot;&gt;Intro to Source Games:&lt;/h3&gt;
+
+&lt;p&gt;Source Engine games consists of two separate parts, the engine and the game.&lt;/p&gt;
+
+&lt;p&gt;The engine consists of all of the typical game engine features like rendering, networking, and the asset loaders for models and materials, and the physics engine. Wen I refer to the &lt;em&gt;Source Engine&lt;/em&gt;, I am referring to this part of the game. The bulk of the engine’s code is found in &lt;code class=&quot;highlighter-rouge&quot;&gt;engine.dll&lt;/code&gt;, which is found in the path &lt;code class=&quot;highlighter-rouge&quot;&gt;/bin/engine.dll&lt;/code&gt; from the game’s root. This same base code is used in some manner across all SE games, and is typically utilized by 3rd party game developers in its pre-compiled form. The code for the Source Engine was &lt;a href=&quot;https://github.com/VSES/SourceEngine2007&quot;&gt;leaked&lt;/a&gt; (luckily) as part of the 2007 Valve leak, and this leak is all the code that is available to the public for the engine.&lt;/p&gt;
+
+&lt;p&gt;The second part, the &lt;em&gt;game&lt;/em&gt;, consists of two main parts, &lt;code class=&quot;highlighter-rouge&quot;&gt;client.dll&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;server.dll&lt;/code&gt;. These binaries contain the compiled game that will use the engine. Both of these dlls will utilize &lt;code class=&quot;highlighter-rouge&quot;&gt;engine.dll&lt;/code&gt; heavily in order to function. Inside of &lt;code class=&quot;highlighter-rouge&quot;&gt;client.dll&lt;/code&gt;, you will find the code responsible for the GUI subsystem (named &lt;a href=&quot;https://developer.valvesoftware.com/wiki/VGUI_Documentation&quot;&gt;VGUI&lt;/a&gt;) of the game and the clientside logic of the actual game itself. Inside of &lt;code class=&quot;highlighter-rouge&quot;&gt;server.dll&lt;/code&gt;, you will find all of the code to communicate the game’s serverside logic to the remote player’s &lt;code class=&quot;highlighter-rouge&quot;&gt;client.dll&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Both the server and client have shared code that defines the entities of the game and variables that will be synchronized. Shared code is compiled directly into each binary, but some C macro design ensures that only the server parts compile to &lt;code class=&quot;highlighter-rouge&quot;&gt;server.dll&lt;/code&gt;, and vice-versa. The &lt;code class=&quot;highlighter-rouge&quot;&gt;engine.dll&lt;/code&gt; entity system will synchronize the server’s simulation of the game, and the client’s dll will take these simulations and display them to the player through the &lt;code class=&quot;highlighter-rouge&quot;&gt;engine.dll&lt;/code&gt; renderer.&lt;/p&gt;
+
+&lt;p&gt;Lastly, a big feature of all Source games that was taken and evolved from the Quake engine is the &lt;a href=&quot;https://developer.valvesoftware.com/wiki/Developer_Console&quot;&gt;ConVar&lt;/a&gt; system. This system defines a series of variables and commands that are executed on an internal command line, very similar to a cmd.exe or /bin/sh shell. The difference is that, instead of executing new processes, these commands will run functions on either the client or server depending on where its run. The engine defines some low-level convars found on both the server and client, while the game dlls add more on top of that depending on the game dll that’s running.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A Console Variable (&lt;a href=&quot;https://developer.valvesoftware.com/wiki/ConVar&quot;&gt;ConVar&lt;/a&gt;) takes the form of &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;name&amp;gt; &amp;lt;value&amp;gt;&lt;/code&gt;, where the value can be numerical or string based. Typically used for configuration, certain special ConVars will be synchronized. The server can always request the value of a client’s ConVar. Example: &lt;code class=&quot;highlighter-rouge&quot;&gt;sv_cheats 1&lt;/code&gt; sets the ConVar &lt;code class=&quot;highlighter-rouge&quot;&gt;sv_cheats&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt;, which enables cheats.&lt;/li&gt;
+  &lt;li&gt;A Console Command (&lt;a href=&quot;https://developer.valvesoftware.com/wiki/ConCommand&quot;&gt;ConCommand&lt;/a&gt;) takes the form of &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;name&amp;gt; &amp;lt;arg0&amp;gt; &amp;lt;arg1&amp;gt; …&lt;/code&gt;, and defines a command with a backing C++ function that can be run from the developer console. Sometimes, it is used by the game or the engine to run remote functions (client -&amp;gt; server, server -&amp;gt; client). Example: &lt;code class=&quot;highlighter-rouge&quot;&gt;changelevel de_dust&lt;/code&gt; executes the command &lt;code class=&quot;highlighter-rouge&quot;&gt;changelevel&lt;/code&gt; with the argument &lt;code class=&quot;highlighter-rouge&quot;&gt;de_dust&lt;/code&gt;, which changes the current map when run on the server console.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;This is just an intro, more on all of this to follow in future posts.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;the-bugs&quot;&gt;The Bugs:&lt;/h3&gt;
+
+&lt;p&gt;All of this old code and custom formats is &lt;em&gt;fantastic&lt;/em&gt; for a bug hunter. In 2018, all that’s truly necessary to perform a full chain RCE is a good memory corruption bug to take control and an information leak to bypass ASLR. Typically, the former is the most difficult part of bug hunting in modern software, but later you will see that, for the SE, it is actually the latter.&lt;/p&gt;
+
+&lt;p&gt;Here is an overview of the Windows binaries:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;32-bit binaries&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;NX&lt;/strong&gt; - Enabled&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Full ASLR&lt;/strong&gt; - Enabled (recently)&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Stack Cookies&lt;/strong&gt; - &lt;u&gt;Disabled&lt;/u&gt; (in the cases it matters)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If you’re an exploit developer, you would probably find the lack of stack cookies in a game engine with millions of players to be a very shocking discovery. This is a vital shortcoming of the already aging engine, and is essentially unheard of in modern Windows binaries. Valve is well aware of this protection’s existence, and has chosen time and time again not to enable it. I have some speculation as to why this is not enabled (most likely performance or build breaking issues), but regardless, there is a huge point to make: &lt;strong&gt;Any controllable stack overflow can overwrite the instruction pointer and divert code execution.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Considering how much the stack is used in this engine, this is a huge benefit to bug hunters. One simple out-of-bounds (OOB) string copy, such as a call to &lt;code class=&quot;highlighter-rouge&quot;&gt;strcpy&lt;/code&gt;, will result in swift compromise of the instruction pointer straight into RCE. My first bug, unsurprisingly, is a stack overflow bug, not much different than you would find in a beginner level CTF challenge. But, unlike the CTF, its implications of a full client machine compromise in a series of games with a huge player base leads to the large payout.&lt;/p&gt;
+
+&lt;h3 id=&quot;hunting&quot;&gt;Hunting:&lt;/h3&gt;
+
+&lt;p&gt;When hunting for these bugs, I chose to take a slightly more difficult path of only performing &lt;em&gt;manual code auditing&lt;/em&gt; on the publicly available engine code. What this allows me to do is both search for potentially useful bugs and also learn the engine’s internals along the way. While it might be enticing for me to just fuzz a file format and get lots of crashes, fuzzing tends to find surface level bugs that everyone’s finding, and never those really deep, interesting bugs that no one is finding.&lt;/p&gt;
+
+&lt;p&gt;As I said previously, the codebase for this engine is gigantic. You should take advantage of all of the tools available to you when searching. My preferred toolset is this:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Following code structure and searches using &lt;strong&gt;Visual Studio with Resharper++&lt;/strong&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Cmder (with grep)&lt;/strong&gt; to search for patterns.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;IDA Pro&lt;/strong&gt; to prove the existence of the bug in the newest build.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;WinDbg and x64dbg&lt;/strong&gt; to attach to the game and try to trigger the bug.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Sourcemod extensions&lt;/strong&gt; to modify the server for proof-of-concepts&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;With these tools, my general “process” for bug hunting is this:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Find some section of the client code I feel is exploitable and want to look into more closely&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Start reading code. I’ll read for hours until I come across what I think is a possible exploitable bug.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;From there, I will open up IDA Pro and locate the function I think is exploitable, then compare its current code with the old, public code I have available.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If it still appears to be exploitable, I will try to find some method to trigger the exploitable function from in-game. This turns out to be one of the hardest parts of the process, because finding a triggerable path to that function is a very difficult task given the size of the engine. Sometimes, the server just can’t trigger the bug remotely. Some familiarity with the engine goes a &lt;em&gt;long&lt;/em&gt; way here.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Lastly, I will write &lt;a href=&quot;https://github.com/alliedmodders/sourcemod&quot;&gt;Sourcemod&lt;/a&gt; plugins that will help me trigger it from a game server to the client, hoping to finally prove the existence of the bug and the exploitability in a proof-of-concept.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;next-time&quot;&gt;Next Time&lt;/h2&gt;
+
+&lt;p&gt;Next post, I will go more in-depth into the codebase of the Engine and explain the entity and networking system that the Engine utilizes to run the game itself. Also, I will begin introducing some of the techniques I used to write the exploits, including the ASLR and NX bypass. There’s a &lt;strong&gt;whole&lt;/strong&gt; lot more to talk about, and this post barely scratches the service. At the moment, I’m in the process of working on a new undisclosed bug in the engine. Hoping to turn this one into another big payout. Wish me luck!&lt;/p&gt;
+
+&lt;p&gt;— Gbps&lt;/p&gt;
+</description>
+        <pubDate>Thu, 02 Aug 2018 00:00:00 -0400</pubDate>
+        <link>http://ctf.re//source-engine/exploitation/reverse-engineering/2018/08/02/source-engine-1/</link>
+        <guid isPermaLink="true">http://ctf.re//source-engine/exploitation/reverse-engineering/2018/08/02/source-engine-1/</guid>
+      </item>
+    
+  </channel>
+</rss>
