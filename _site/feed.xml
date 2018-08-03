@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Reversing Engineering for the Soul</title>
-    <description>Everything you've ever wanted to know about programs you've never heard of</description>
-    <link>http://ctf.re//</link>
-    <atom:link href="http://ctf.re//feed.xml" rel="self" type="application/rss+xml" />
+    <title>Coming soon 👀</title>
+    <description>:gbpsthink:</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
         <title>Exploiting the Source Engine (Part 1)</title>
@@ -136,8 +136,8 @@
 &lt;p&gt;— Gbps&lt;/p&gt;
 </description>
         <pubDate>Thu, 02 Aug 2018 00:00:00 -0400</pubDate>
-        <link>http://ctf.re//source-engine/exploitation/reverse-engineering/2018/08/02/source-engine-1/</link>
-        <guid isPermaLink="true">http://ctf.re//source-engine/exploitation/reverse-engineering/2018/08/02/source-engine-1/</guid>
+        <link>http://localhost:4000/source-engine/exploitation/reverse-engineering/2018/08/02/source-engine-1.html</link>
+        <guid isPermaLink="true">http://localhost:4000/source-engine/exploitation/reverse-engineering/2018/08/02/source-engine-1.html</guid>
       </item>
     
   </channel>
