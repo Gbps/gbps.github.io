@@ -240,7 +240,7 @@ With a bit of searching, I found that the ConVar `sv_mumble_positionalaudio` exi
 {: refdef}
 This means to calculate the value of `m_pszString`, we add `0x1A` to get `0x10C6B788 + 0x1C = 0x10C6b7A4`. In this build, `entitylist` is at an aligned offset of `4` (`0xC580B4`). So, now we can calculate if this candidate is aligned properly:
 
-```
+```plain
 >>> 0x10c6b7a4 % 0x8
 4
 ```
@@ -431,7 +431,7 @@ I also placed a Frida Interceptor hook on the function responsible for reading t
 {: refdef}
 Lastly, I hooked the function responsible for processing incoming file fragment packets on the server, and lo and behold, I have this blob of data being sent to us:
 
-```
+```plain
            0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF
 00000000  50 4b 05 06 00 00 00 00 06 00 06 00 f0 01 00 00  PK..............
 00000010  86 62 00 00 20 00 58 5a 50 31 20 30 00 00 00 00  .b.. .XZP1 0....
@@ -462,7 +462,7 @@ The offsets of these pointer values in the 0x100 byte buffer are not always at t
 
 Here's what the final output of the exploit looked like against a typical user:
 
-```
+```plain
 [*] Intercepting ReadBytes (frag = 0)
 0x0: 0x14b5041
 0x4: 0x14001402
