@@ -185,7 +185,7 @@ struct EntityCacheInfo_t
 };
 ```
 
-ll together, this vulnerability allows us to return an arbitrary `IClientNetworkable*` from `GetClientNetworkable` as long as it is aligned to an `8` byte boundary (as `sizeof(m_EntityCacheInfo) == 8`). This is important for finding future exploit chaining.
+All together, this vulnerability allows us to return an arbitrary `IClientNetworkable*` from `GetClientNetworkable` as long as it is aligned to an `8` byte boundary (as `sizeof(m_EntityCacheInfo) == 8`). This is important for finding future exploit chaining.
 
 Lastly, the result of returning an arbitrary `IClientNetworkable*` is that there is immediately this function call on our controlled `pEnt` pointer:
 
@@ -222,7 +222,7 @@ char *m_pszString; [0x1C]
 
 In this bug, we're targeting `m_pszString` so that our crafted pointer lands directly on `m_pszString`. When the bug calls our function, it will believe that `&m_pszString` is the location of the object's pointer, and `m_pszString` will contain its vtable pointer. The engine will now believe that any value inside of `m_pszString` for the ConVar will be part of the object's structure. Then, it will call a function pointer at `*((*m_pszString)+0x1C)`. As long as the `ConVar` on the client is marked as `FCVAR_REPLICATED`, the server can set its value arbitrarily, giving us full control over the contents of `m_pszString`. If we point the vtable pointer to the right place, this will give us control over the instruction pointer!
 
-`m_pszString` is at offset `0x1C` in the above `ConVar` structure, but the terms of our vulnerability requires that this pointer be aligned to an `8` byte boundary. Therefore, we need to find a suitable candidate global, replicated `ConVar ` such that we can align `m_pszString` to correctly to return it to `GetClientNetworkable`. 
+`m_pszString` is at offset `0x1C` in the above `ConVar` structure, but the terms of our vulnerability requires that this pointer be aligned to an `8` byte boundary. Therefore, we need to find a suitable candidate `ConVar` that is both globally defined and replicated so that we can align `m_pszString` to correctly to return it to `GetClientNetworkable`. 
 
 This can be seen by what `GetClientNetworkable` looks like in x64dbg:
 {:refdef: style="text-align: center;"}
