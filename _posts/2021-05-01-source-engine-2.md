@@ -264,8 +264,8 @@ bool NET_Tick::ReadFromBuffer( bf_read &buffer )
 
 	m_nTick = buffer.ReadLong();
 #if PROTOCOL_VERSION > 10
-	m_flHostFrameTime				= (float)buffer.ReadUBitLong( 16 ) / NET_TICK_SCALEUP;
-	m_flHostFrameTimeStdDeviation	= (float)buffer.ReadUBitLong( 16 ) / NET_TICK_SCALEUP;
+	m_flHostFrameTime = (float)buffer.ReadUBitLong( 16 ) / NET_TICK_SCALEUP;
+	m_flHostFrameTimeStdDeviation = (float)buffer.ReadUBitLong( 16 ) / NET_TICK_SCALEUP;
 #endif
 	return !buffer.IsOverflowed();
 }
