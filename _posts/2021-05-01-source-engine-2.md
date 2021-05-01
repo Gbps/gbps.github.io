@@ -111,7 +111,7 @@ An option to getting around this information leak constraint is to focus on find
 
 Heap exploits are cool to write, but often their stability can be difficult to achieve due to the vast number of heap allocations happening at any given time. This makes carving out areas of heap memory for your exploit require careful consideration for specifically sized holes of memory and the timing at which these holes are made. This process is lovingly referred to as [Heap Feng Shui](https://en.wikipedia.org/wiki/Heap_feng_shui). In this post, I do not go over how to exploit heap vulnerabilities on the Source engine, but I will note that, due to its custom allocator, the allocations are much more predictable than the default Windows 10 heap, which is a nice benefit for those looking to do heap corruption.
 
-Also, notice the word *queryable* above. This means that, whatever you corrupt for your information leak, you need to ensure that it can be queried over the network. Very few types of game objects can be queried arbitrarily. The best type of queryable object to work with in Source is the `ConVar`object, which represents a configurable console variable. Both the client and server can send requests to query the value of any `ConVar`object using the , and whatever is sent back is the value of either the integer value of the `CVar`, or an arbitrary-length string value.
+Also, notice the word *queryable* above. This means that, whatever you corrupt for your information leak, you need to ensure that it can be queried over the network. Very few types of game objects can be queried arbitrarily. The best type of queryable object to work with in Source is the `ConVar` object, which represents a configurable console variable. Both the client and server can send requests to query the value of any `ConVar` object. the string that is sent back is the value of either the integer value of the `CVar`, or an arbitrary-length string value.
 
 ## Bug Hunting - Struggling is fun!
 
@@ -199,7 +199,7 @@ This is a virtual function call. This means that the generated code will offset 
 {: refdef}
 Notice `call dword ptr [eax+24]`. This implies that the vtable index is at `24 / 4 = 6`, which is also important to know for future exploitation.
 
-And that's it, we have our first bug. This will allow us to control, within reason, the location of a *fake object* in the client to later craft into an arbitrary execute. But how are we going to create a fake object at a known location such that we can convince `CL_CopyExistingEntity` to call the address of our choose? Well, we can take advantage of the fact that the server can set any arbitrary value to a `ConVar`on a client, and most `ConVar`objects exist in globals defined inside of `client.dll`.
+And that's it, we have our first bug. This will allow us to control, within reason, the location of a *fake object* in the client to later craft into an arbitrary execute. But how are we going to create a fake object at a known location such that we can convince `CL_CopyExistingEntity` to call the address of our choose? Well, we can take advantage of the fact that the server can set any arbitrary value to a `ConVar` on a client, and most `ConVar` objects exist in globals defined inside of `client.dll`.
 
 The definition of ConVar is:
 
