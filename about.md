@@ -13,7 +13,7 @@ Right now, my projects are mostly based in low-level software exploitation topic
 
 I spend a lot of time auditing code for vulnerabilities and like to approach vulnerability research in somewhat creative ways. My goal in life is to understand how computers work from the highest of high levels to the lowest of low levels, and everything in between. I just also have an obsession with summoning calculators.
 
-If you need to get in contact with me, I own/operate the Reverse Engineering Discord, so you can always find me there: https://discord.gg/ESGEZaVUmV
+If you need to get in contact with me, I own/operate the Reverse Engineering Discord, so you can always find me there: [https://discord.gg/ESGEZaVUmV](https://discord.gg/ESGEZaVUmV)
 
 Hope you enjoy.
 
