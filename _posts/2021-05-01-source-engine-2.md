@@ -169,7 +169,7 @@ IClientNetworkable* CClientEntityList::GetClientNetworkable( int entnum )
 
 As we see here, these `Assert` statements would typically check to make sure that this value is sane, and crash the game if they weren't. But, this is not what happens in practice. In release builds of the game, all `Assert` statements are not compiled into the game. This is for performance reasons, as the #1 goal of any game engine programmer is speed first, everything else second. 
 
-Anyways, these `Assert` statements do not prevent us from controlling `entnum` arbitrarily. `m_EntityCacheInfo` exists inside of a globally defined structure `entitylist` inside of `client.dll`. This object holds the client's central store of all data related to game entities. This means that `m_EntityCacheInfo` since is at a static global offset, this allows us to calculate the proper values of `entnum` for our exploit easily by locating the offset of `m_EntityCacheInfo` in any given version of `client.dll` and calculating a proper value of `entnum` to create our target pointer.
+Anyway, these `Assert` statements do not prevent us from controlling `entnum` arbitrarily. `m_EntityCacheInfo` exists inside of a globally defined structure `entitylist` inside of `client.dll`. This object holds the client's central store of all data related to game entities. This means that `m_EntityCacheInfo` since is at a static global offset, this allows us to calculate the proper values of `entnum` for our exploit easily by locating the offset of `m_EntityCacheInfo` in any given version of `client.dll` and calculating a proper value of `entnum` to create our target pointer.
 
 Here is what an object inside of `m_EntityCacheInfo` looks like:
 
@@ -413,7 +413,7 @@ g_pFileSystem->Read( tmpbuf, length, data->file );
 buf.WriteBytes( tmpbuf, length );
 ```
 
-A stack buffer of size 0x100 is used to read contents of the file in 0x100 sized chunks as the file is sent to the server. It does so by calling `g_pFileSystem->Read()` on the file pointer and reading out the data to a temporary buffer on stack. The subchannel believes this file to be very large (as the subchannel interprets the size as an unsigned integer). The networking code will indefinitely send chunks to the server by allocating `0x100` of stack space and calling `->Read()`. But, when the file pointer reaches the end of the pakfile, the calls to `->Read()` stop writing out any data to the stack as there is no data left to read. Rather than failing out of this function, the return value of `->Read()` is ignored and the data is sent anyways. Because the stack's contents are not cleared with each iteration, 0x100 bytes of uninitialized stack data are sent to the server constantly. The client's subchannel will continue to send fragments indefinitely as the "file size" is too large to ever be sent successfully.
+A stack buffer of size 0x100 is used to read contents of the file in 0x100 sized chunks as the file is sent to the server. It does so by calling `g_pFileSystem->Read()` on the file pointer and reading out the data to a temporary buffer on stack. The subchannel believes this file to be very large (as the subchannel interprets the size as an unsigned integer). The networking code will indefinitely send chunks to the server by allocating `0x100` of stack space and calling `->Read()`. But, when the file pointer reaches the end of the pakfile, the calls to `->Read()` stop writing out any data to the stack as there is no data left to read. Rather than failing out of this function, the return value of `->Read()` is ignored and the data is sent Anyway. Because the stack's contents are not cleared with each iteration, 0x100 bytes of uninitialized stack data are sent to the server constantly. The client's subchannel will continue to send fragments indefinitely as the "file size" is too large to ever be sent successfully.
 
 After quite a bit of learning about how the PKZIP file structure works, I was able to write up this Python script which can take an existing BSP and hack in a negatively sized file into the pakfile. Here's the result:
 {:refdef: style="text-align: center;"}
@@ -504,14 +504,33 @@ Here's what the final output of the exploit looked like against a typical user:
 Only one of these values had a lower WORD offset that made sense (`0xE4`) therefore it was easily selectable from the list of DWORDS. After leaking this pointer, I traced it back in IDA to a return location for the upper stack frame of this function, which makes total sense. I gave it a label `Engine_Leak2` in IDA, which could be loaded directly from my ret-sync connection to dynamically calculate the proper base address of the `engine.dll` module:
 
 ```tsx
-let knownOffset = se.util.require_offset("Engine_Leak2");
+// calculate the engine base based on the RE'd address we know from the leak
+static convertLeakToEngineBase(leakedPointer: NativePointer) {
+    console.log("[*] leakedPointer: " + leakedPointer)
+
+    // get the known offset of the leaked pointer in our engine.dll
+    let knownOffset = se.util.require_offset("Engine_Leak2");
+    console.log("[*] Engine_Leak2 offset: " + knownOffset)
+
+    // use the offset to find the base of the client's engine.dll
+    let leakedBase = leakedPointer.sub(knownOffset);
+    console.log("[*] leakedBase: " + leakedBase)
+
+    if ((leakedBase.toInt32() & 0xFFFF) !== 0) {
+        console.log("[!] Failed leak...")
+        return null;
+    }
+
+    console.log("[*] Got it!")
+    return leakedBase;
+}
 ```
 
 ## The Final Chain + RCE!
 
 After successfully developing the infoleak, now we have both a pointer leak and an arbitrary execute bug. These two are sufficient enough for us to craft a ROP chain and pop that sweet sweet calculator. The nice part about Frida being a Python module at its core is that you can use [pyinstaller](https://www.pyinstaller.org/) to turn any Frida script into an all-in-one executable. That way, all you have to do is copy the .exe onto a server, run your Source dedicated server, and launch the `.exe` to arm the server for exploitation.
 
-Anyways, he is the full step-by-step detail of chaining the two bugs together:
+Anyway, here is the full step-by-step detail of chaining the two bugs together:
 
 1. Player joins the exploitation server. This is picked up by the PoC script and it begins to exploit the client.
 
