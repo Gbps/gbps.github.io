@@ -554,7 +554,7 @@ And there you have it. This entire exploitation happens automatically, and does 
 
 Exploit PoC and the map hacking Python script referenced in this post are available in full at:
 
-(https://github.com/Gbps/sourceengine-packetentities-rce-poc)[https://github.com/Gbps/sourceengine-packetentities-rce-poc]
+[https://github.com/Gbps/sourceengine-packetentities-rce-poc](https://github.com/Gbps/sourceengine-packetentities-rce-poc)
 
 But sure to give it a ⭐ if you liked it!
 
