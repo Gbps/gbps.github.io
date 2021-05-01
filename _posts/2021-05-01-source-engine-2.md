@@ -141,15 +141,15 @@ The function looks like so:
 ```cpp
 void CL_CopyExistingEntity( CEntityReadInfo &u )
 {
-	int start_bit = u.m_pBuf->GetNumBitsRead();
+    int start_bit = u.m_pBuf->GetNumBitsRead();
 
-	IClientNetworkable *pEnt = entitylist->GetClientNetworkable( u.m_nNewEntity );
-	if ( !pEnt )
-	{
-		Host_Error( "CL_CopyExistingEntity: missing client entity %d.\n", u.m_nNewEntity );
-		return;
-	}
-    
+    IClientNetworkable *pEnt = entitylist->GetClientNetworkable( u.m_nNewEntity );
+    if ( !pEnt )
+    {
+        Host_Error( "CL_CopyExistingEntity: missing client entity %d.\n", u.m_nNewEntity );
+        return;
+    }
+
     Assert( u.m_pFrom->transmit_entity.Get(u.m_nNewEntity) );
 
     // Read raw data from the network stream
