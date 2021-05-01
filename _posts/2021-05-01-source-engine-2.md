@@ -431,9 +431,9 @@ Now, we can test it by loading up Frida and crafting a packet to request the hac
 This shows us that the client is sending many file fragments (`num = 1` means file fragment). When left running, it will not stop re-leaking that stack memory to us, and will just continue to do so infinitely as long as the client is connected. This happens slowly over time, so the client's game is unaffected.
 
 I also placed a Frida Interceptor hook on the function responsible for reading the file's size, and here we can see that it is indeed returning a negative number:
-
+{:refdef: style="text-align: center;"}
 ![image-20200506164957309](/assets/image-20200506164957309.png)
-
+{: refdef}
 Lastly, I hooked the function responsible for processing incoming file fragment packets on the server, and lo and behold, I have this blob of data being sent to us:
 
 ```
