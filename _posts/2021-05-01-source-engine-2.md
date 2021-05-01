@@ -458,7 +458,7 @@ You might not be able to tell, but this data is uninitialized. Specifically, the
 - `05 b9 00 7c`
 - `05 b8 00 7c`
 
-The offsets of these pointer values in the 0x100 byte buffer are not always at the same place. Some heuristics definitely go a long way here. A simple mapping of DWORD values inside the buffer over time can show that some values quickly look like pointers and some do not. After a bit of tinkering with this leak, I was able to get it controlled to leak a known pointer value within near-100% certainty.
+The offsets of these pointer values in the 0x100 byte buffer are not always at the same place. Some heuristics definitely go a long way here. A simple mapping of DWORD values inside the buffer over time can show that some values quickly look like pointers and some do not. After a bit of tinkering with this leak, I was able to get it controlled to leak a known pointer value with ~100% certainty.
 
 Here's what the final output of the exploit looked like against a typical user:
 
