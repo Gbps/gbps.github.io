@@ -2,7 +2,7 @@
 title:       Reversing Engineering for the Soul
 email:       gbps@ctf.re
 author:      gbps
-description: "Everything you've ever wanted to know about programs you've never heard of"
+description: "Gbps' Exploitation + Reverse Engineering Blog"
 baseurl:     ""
 url:         "https://ctf.re/"
 date_format: " "
