@@ -556,7 +556,7 @@ Exploit PoC and the map hacking Python script referenced in this post are availa
 
 https://github.com/Gbps/sourceengine-packetentities-rce-poc
 
-But sure to give it a :star2: if you liked it! :)
+But sure to give it a ⭐ if you liked it! :)
 
 ## Final thoughts
 
