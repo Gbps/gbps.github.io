@@ -514,7 +514,7 @@ let knownOffset = se.util.require_offset("Engine_Leak2");
 
 After successfully developing the infoleak, now we have both a pointer leak and an arbitrary execute bug. These two are sufficient enough for us to craft a ROP chain and pop that sweet sweet calculator. The nice part about Frida being a Python module at its core is that you can use [pyinstaller](https://www.pyinstaller.org/) to turn any Frida script into an all-in-one executable. That way, all you have to do is copy the .exe onto a server, run your Source dedicated server, and launch the `.exe` to arm the server for exploitation.
 
-Anyways, he is the full step-by-step detail of the full chain and how both bugs are chained together:
+Anyways, he is the full step-by-step detail of chaining the two bugs together:
 
 1. Player joins the exploitation server. This is picked up by the PoC script and it begins to exploit the client.
 
