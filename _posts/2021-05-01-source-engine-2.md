@@ -132,7 +132,7 @@ Here's what I eventually settled on for my chain:
 
 I would say the general length of time to discover the memory corruption was about 1/10th of the time I spent finding the information leak. I spent around two months auditing code for information leaks, whereas the memory corruption bug became quickly obvious within a few days of auditing the networking code.
 
-##Memory Corruption - Arbitrary execute with CL_CopyExistingEntity
+## Memory Corruption - Arbitrary execute with CL_CopyExistingEntity
 
 The vulnerability I used for memory corruption was the array index over/under-flow in the low-level networking function `CL_CopyExistingEntity`. This is a function called within the packet handler for the server->client packet named `SVC_PacketEntities`. In Source, the way data about changes to game objects is communicated is through the "delta" system. The server calculates what values have changed about an entity between two points in time and sends that information to your client in the form of a "delta". This function is responsible for copying any changed variables of an existing game object from the network packet received from the server into the values stored on the client. I would consider this a very core part of the Source networking, which means that it exists across the board for all Source games. I have not verified it exists in older GoldSrc games, but I would not be surprised, considering this code and vulnerability are ancient and have existed for 15+ years untouched.
 
