@@ -26,7 +26,7 @@ After getting that simple client and server set up for Frida, I created a [Types
 
 An example of what these wrappers look like:
 
-```tsx
+```typescript
 // Create a pointer to the IVEngineClient interface by calling CreateInterface exported by engine.dll
 let client = IVEngineClient.CreateInterface()
 log(`IVEngineClient: ${client.pointer}`)
@@ -49,7 +49,7 @@ Lastly, I decided to create a fairly novel Frida extension module that utilized 
 
 Here's an example of hooking a function by IDA symbol using my ret-sync extension. The script dynamically asks my IDA instance where `CGameClient::ProcessSignonStateMsg` exists inside `engine.dll` the current process, hooks it, and then does some functionality with some engine objects:
 
-```tsx
+```typescript
 // Hook when new clients are connecting and wait for them to spawn in to begin exploiting them. This function is called every time a client transitions from one state to the next while loading into the server.
 let signonstate_fn = se.util.require_symbol("CGameClient::ProcessSignonStateMsg")
 Interceptor.attach(signonstate_fn, {
@@ -277,7 +277,7 @@ As you might see, `m_nTick` is controlled by the contents of the `NET_Tick` pack
 {: refdef}
 The code to send this packet with my Frida bindings is quite simple too:
 
-```tsx
+```typescript
 function SetClientTick(bf: bf_write, value: NativePointer) {
     bf.WriteUBitLong(net_Tick, NETMSG_BITS)
 
@@ -294,7 +294,7 @@ function SetClientTick(bf: bf_write, value: NativePointer) {
 
 Now we have a candidate location to point our vtable pointer. We just have to point it at `&tickcount - 24` and the engine will believe that `tickcount` is the function that should be called in the vtable. After a bit of testing, here's the resulting script which creates and sends the `SVC_PacketEntities` packet to the client to trigger the exploit:
 
-```tsx
+```typescript
 // craft the netmessage for the PacketEntities exploit
 function SendExploit_PacketEntities(bf: bf_write, offset: number) {
     bf.WriteUBitLong(svc_PacketEntities, NETMSG_BITS)
@@ -346,7 +346,7 @@ Now we've got the following modified chain:
 
 This generally looks like this in the exploit script:
 
-```tsx
+```typescript
 // The fake object pointer and the ROP chain are stored in this cvar
 ReplicateCVar(pkts_to_send, "sv_mumble_positionalaudio", tickCountAddress)
 
@@ -503,7 +503,7 @@ Here's what the final output of the exploit looked like against a typical user:
 
 Only one of these values had a lower WORD offset that made sense (`0xE4`) therefore it was easily selectable from the list of DWORDS. After leaking this pointer, I traced it back in IDA to a return location for the upper stack frame of this function, which makes total sense. I gave it a label `Engine_Leak2` in IDA, which could be loaded directly from my ret-sync connection to dynamically calculate the proper base address of the `engine.dll` module:
 
-```tsx
+```typescript
 // calculate the engine base based on the RE'd address we know from the leak
 static convertLeakToEngineBase(leakedPointer: NativePointer) {
     console.log("[*] leakedPointer: " + leakedPointer)
