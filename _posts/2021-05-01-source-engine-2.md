@@ -504,7 +504,7 @@ Here's what the final output of the exploit looked like against a typical user:
 [*] leakedBase: 0x7aa60000
 ```
 
-Only one of these values had a lower WORD offset that made sense (`0xE4`) therefore it was easily selectable from the list of DWORDS. After leaking this pointer, I traced it back in IDA to a return location for the upper stack frame of this function, which makes total sense. I gave it a label `Engine_Leak2` in IDA, which could be loaded directly from my ret-sync connection with to dynamically calculate the proper base address of the `engine.dll` module:
+Only one of these values had a lower WORD offset that made sense (`0xE4`) therefore it was easily selectable from the list of DWORDS. After leaking this pointer, I traced it back in IDA to a return location for the upper stack frame of this function, which makes total sense. I gave it a label `Engine_Leak2` in IDA, which could be loaded directly from my ret-sync connection to dynamically calculate the proper base address of the `engine.dll` module:
 
 ```tsx
 let knownOffset = se.util.require_offset("Engine_Leak2");
