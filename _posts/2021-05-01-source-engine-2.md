@@ -50,7 +50,9 @@ Lastly, I decided to create a fairly novel Frida extension module that utilized 
 Here's an example of hooking a function by IDA symbol using my ret-sync extension. The script dynamically asks my IDA instance where `CGameClient::ProcessSignonStateMsg` exists inside `engine.dll` the current process, hooks it, and then does some functionality with some engine objects:
 
 ```typescript
-// Hook when new clients are connecting and wait for them to spawn in to begin exploiting them. This function is called every time a client transitions from one state to the next while loading into the server.
+// Hook when new clients are connecting and wait for them to spawn in to begin exploiting them. 
+// This function is called every time a client transitions from one state to the next 
+//     while loading into the server.
 let signonstate_fn = se.util.require_symbol("CGameClient::ProcessSignonStateMsg")
 Interceptor.attach(signonstate_fn, {
     onEnter(args) {
