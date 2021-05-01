@@ -194,9 +194,9 @@ pEnt->PreDataUpdate( DATA_UPDATE_DATATABLE_CHANGED );
 ```
 
 This is a virtual function call. This means that the generated code will offset into `pEnt`'s vtable and call a function. This looks like so in IDA:
-
+{:refdef: style="text-align: center;"}
 ![image-20200507164606006](/assets/image-20200507164606006.png)
-
+{: refdef}
 Notice `call dword ptr [eax+24]`. This implies that the vtable index is at `24 / 4 = 6`, which is also important to know for future exploitation.
 
 And that's it, we have our first bug. This will allow us to control, within reason, the location of a *fake object* in the client to later craft into an arbitrary execute. But how are we going to create a fake object at a known location such that we can convince `CL_CopyExistingEntity` to call the address of our choose? Well, we can take advantage of the fact that the server can set any arbitrary value to a `ConVar`on a client, and most `ConVar`objects exist in globals defined inside of `client.dll`.
@@ -225,9 +225,9 @@ In this bug, we're targeting `m_pszString` so that our crafted pointer lands dir
 `m_pszString` is at offset ` 0x1C `in the above `ConVar` structure, but the terms of our vulnerability requires that this pointer be aligned to an `8` byte boundary. Therefore, we need to find a suitable candidate global, replicated `ConVar ` such that we can align `m_pszString` to correctly to return it to `GetClientNetworkable`. 
 
 This can be seen by what `GetClientNetworkable` looks like in x64dbg:
-
+{:refdef: style="text-align: center;"}
 ![image-20200507170851575](/assets/image-20200507170851575.png)
-
+{: refdef}
 In the above, the pointer we can return is controlled as such:
 
 ```
@@ -235,9 +235,9 @@ ecx+eax*8+28 where ecx is entitylist, eax is controlled by us
 ```
 
 With a bit of searching, I found that the ConVar `sv_mumble_positionalaudio` exists in `client.dll` and is replicated. Here it exists at `0x10C6B788` in `client.dll`:
-
+{:refdef: style="text-align: center;"}
 ![image-20200507173708203](/assets/image-20200507173708203.png)
-
+{: refdef}
 This means to calculate the value of `m_pszString`, we add `0x1A` to get `0x10C6B788 + 0x1C = 0x10C6b7A4`. In this build, `entitylist` is at an aligned offset of `4` (`0xC580B4`). So, now we can calculate if this candidate is aligned properly:
 
 ```
@@ -274,9 +274,9 @@ bool NET_Tick::ReadFromBuffer( bf_read &buffer )
 ```
 
 As you might see, `m_nTick` is controlled by the contents of the `NET_Tick` packet directly. This means we can assign this to an arbitrary 32-bit value. It just so happens that this value is stored at a global as well! After some scripting up in Frida, I confirmed that this is indeed completely controllable by the `NET_Tick` packet from the server:
-
+{:refdef: style="text-align: center;"}
 ![image-20200513141444074](/assets/image-20200513141444074.png)
-
+{: refdef}
 The code to send this packet with my Frida bindings is quite simple too:
 
 ```tsx
@@ -365,9 +365,9 @@ SendExploit_PacketEntities(pkts_to_send, 0x26DA)
 `0x26DA` was calculated above to be the necessary `entnum` value to cause the out-of-bounds and align us to `sv_mumble_positionalaudio->m_pszString`.
 
 Finally, we can see the results of our efforts:
-
+{:refdef: style="text-align: center;"}
 ![image-20200513142919977](/assets/image-20200513142919977.png)
-
+{: refdef}
 As we can see here, `0x41414141` is being popped off the stack at the `ret`, giving us a one-shot arbitrary execute! What you can't see here is that, further down on the stack, our entire packet is sitting there unchanged, giving us ample room for a ROP chain.
 
 Now, all we need is a pivot, which can be easily found using the [Ropper](https://github.com/sashs/Ropper) project. After finding an appropriate pivot, we now can begin crafting a ROP chain... except we are missing something important. We don't know where any gadgets are located in memory, including our stack pivot! Up until now, everything we've done is with relative offsets, but now we don't even know where to point the value of `0x41414141` to on the client, because the layout of the code is randomized by ASLR. The easy way out would be to load up CS:GO and use `xinput.dll` addresses for our ROP chain... but that would violate my arbitrary constraint that this exploit must work for *all* Source games.
@@ -397,9 +397,9 @@ if ( totalBytes >= (net_maxfilesize.GetInt()*1024*1024) )
 ```
 
 So, what happens inside of `g_pFileSystem->Size` when you point it to a file inside the pakfile? Well, the code reads the ZIP file structure and locates the file, then reads the size directly from the ZIP header:
-
+{:refdef: style="text-align: center;"}
 ![image-20200430014752750](/assets/image-20200430014752750.png)
-
+{: refdef}
 Notice: `lookup.m_nLength = zipFileHeader.uncompressedSize`
 
 Now we fully control the contents of the map file we gave to the client when they loaded in. Therefore, we control all the contents of the embedded pakfile inside the map. This means we control the full 32-bit value returned by `g_pFileSystem->Size( filename, pPathID );`.
@@ -421,13 +421,13 @@ buf.WriteBytes( tmpbuf, length );
 A stack buffer of size 0x100 is used to read contents of the file in 0x100 sized chunks as the file is sent to the server. It does so by calling `g_pFileSystem->Read()` on the file pointer and reading out the data to the stack. The subchannel believes this file to be very large (as the subchannel interprets the size as an unsigned integer), it will indefinitely send chunks to the server by allocating `0x100` of stack space and calling `->Read()`. But, when the file pointer reaches the end of the pakfile, the calls to `->Read()` stop writing out any data to the stack as there is no data left to read. Rather than failing, the return value of `->Read()` is ignored and the data is sent anyways. Because the stack's contents are not cleared with each iteration, 0x100 bytes of uninitialized stack data are sent to the server constantly. The client's subchannel will continue to send fragments indefinitely as the "file size" is too large to ever be sent successfully.
 
 After quite a bit of learning about how the PKZIP file structure works, I was able to write up this Python script which can take an existing BSP and hack in a negatively sized file into the pakfile. Here's the result:
-
+{:refdef: style="text-align: center;"}
 ![image-20200506163703366](/assets/image-20200506163703366-1619886788574.png)
-
+{: refdef}
 Now, we can test it by loading up Frida and crafting a packet to request the hacked file be uploaded to the server from the pakfile. Then, we can enable `net_showfragments 1` in the game's console to see all of the fragments that are being sent to us:
-
+{:refdef: style="text-align: center;"}
 ![image-20200506171807825](/assets/image-20200506171807825.png)
-
+{: refdef}
 This shows us that the client is sending many file fragments (`num = 1` means file fragment). When left running, it will not stop re-leaking that stack memory to us, and will just continue to do so infinitely as long as the client is connected. This happens slowly over time, so the client's game is unaffected.
 
 I also placed a Frida Interceptor hook on the function responsible for reading the file's size, and here we can see that it is indeed returning a negative number:
@@ -541,7 +541,7 @@ Anyways, he is the full step-by-step detail of the full chain and how both bugs 
 
 And there you have it. This entire exploitation happens automatically, and does so by using Frida to inject into the dedicated server process to instrument to do all of the steps above. This is quite involved, but the result is pretty awesome! Here's a video of the full PoC in action, be sure to full screen it so it's easier to see:
 
-<video controls width="850">
+<video controls width="1200">
   <source type="video/mp4" src="https://ctf.re/static/packetentities_exploit_full.mp4">
 </video>
 
