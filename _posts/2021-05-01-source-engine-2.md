@@ -230,7 +230,7 @@ This can be seen by what `GetClientNetworkable` looks like in x64dbg:
 {: refdef}
 In the above, the pointer we can return is controlled as such:
 
-```
+```plain
 ecx+eax*8+28 where ecx is entitylist, eax is controlled by us
 ```
 
