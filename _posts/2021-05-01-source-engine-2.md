@@ -304,10 +304,7 @@ function SendExploit_PacketEntities(bf: bf_write, offset: number) {
 
     // Is Delta?
     bf.WriteBit(0)
-
-    // DeltaFrom=?
-    // bf.WriteUBitLong(0, 32)
-
+    
     // Baseline?
     bf.WriteBit(0)
 
