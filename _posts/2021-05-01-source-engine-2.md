@@ -247,7 +247,7 @@ This means to calculate the value of `m_pszString`, we add `0x1A` to get `0x10C6
 
 This might look wrong, but `entitylist` is actually aligned to a `0x04` boundary, so that will add an extra `0x04` to the above alignment, making this value successfully align to `0x08`!
 
-This means we're good to go ahead and use the `m_pszString` value of `sv_mumble_positionalaudio` to fake our object's vtable *pointer* by using the server to control the string data contents through ConVar replication.
+Now we're good to go ahead and use the `m_pszString` value of `sv_mumble_positionalaudio` to fake our object's vtable *pointer* by using the server to control the string data contents through ConVar replication.
 
 In summary, this is the path the code above will take:
 
