@@ -342,7 +342,7 @@ Now we've got the following modified chain:
 
 - Call `GetClientNetworkable` to get `pEnt`, which we will fake to point to `&m_pszString`.
 - The code dereferences the first value inside of `m_pszString` to get the pointer to the vtable. We point this at `&tickcount - 6*4` which we control.
-- The code offsets the vtable to index 6, dereferences, and calls the function... which will be the value we put in `tickcount`. 
+- The code offsets the vtable to index 6, dereferences, and calls the "function", which will be the value we put in `tickcount`. 
 
 This generally looks like this in the exploit script:
 
