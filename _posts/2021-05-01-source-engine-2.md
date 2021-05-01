@@ -120,7 +120,7 @@ This time around, I gave myself a few constraints to make the exploit process a 
 - The exploit must be memory corruption and must not be a trivial stack-based buffer overflow
 - The exploit must produce its own pointer leak, or chain another bug to infoleak
 - The exploit must work in all Source 1 games (TF2, CS:GO, L4D:2, etc.) and not require any special configuration of the client
-- The exploit must have a near-100% stability rate
+- The exploit must have a ~100% stability rate
 - The exploit must be written using Frida, and must be "one-click" automatically exploited on any client connected to the server
 
 Given these constraints, I ruled out quite a few bugs. Most of these were because they were trivial stack-based buffer overflows, or present in only one game but not the other.
