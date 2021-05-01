@@ -255,8 +255,6 @@ In summary, this is the path the code above will take:
 - The code dereferences the first value inside of `m_pszString` to get the pointer to the vtable
 - The code offsets the vtable to index 6 and calls the first function there. We need to make sure we point this to a place we control, otherwise we would only be controlling the *vtable pointer* and not the actual *function address in the table*.
 
-## 
-
 But where are we going to point the vtable? Well, we don't need much, just a location of a known place the server can control so we can write an address we want to execute. I did some searching and came across this:
 
 ```cpp
