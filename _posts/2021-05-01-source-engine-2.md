@@ -152,8 +152,8 @@ void CL_CopyExistingEntity( CEntityReadInfo &u )
     
     Assert( u.m_pFrom->transmit_entity.Get(u.m_nNewEntity) );
 
-	// Read raw data from the network stream
-	pEnt->PreDataUpdate( DATA_UPDATE_DATATABLE_CHANGED );
+    // Read raw data from the network stream
+    pEnt->PreDataUpdate( DATA_UPDATE_DATATABLE_CHANGED );
 ```
 
 `u.m_nNewEntity` is controlled arbitrarily by the network packet, therefore this first argument to `GetClientNetworkable` can be an arbitrary 32-bit value. Now let's look at `GetClientNetworkable`:
@@ -203,21 +203,21 @@ And that's it, we have our first bug. This will allow us to control, within reas
 
 The definition of ConVar is:
 
-```
+```cpp
 class ConVar : public ConCommandBase, public IConVar
 ```
 
 Where the general structure of a `ConVar` looks like:
 
-```
-ConCommandBase				*m_pNext; [0x00]
-bool						m_bRegistered; [0x04]
-const char 					*m_pszName; [0x08]
-const char 					*m_pszHelpString; [0x0C]
-int							m_nFlags; [0x10]
-ConVar						*m_pParent; [0x14]
-const char					*m_pszDefaultValue; [0x18]
-char                        *m_pszString; [0x1C]
+```cpp
+ConCommandBase *m_pNext; [0x00]
+bool m_bRegistered; [0x04]
+const cha *m_pszName; [0x08]
+const char *m_pszHelpString; [0x0C]
+int m_nFlags; [0x10]
+ConVar *m_pParent; [0x14]
+const char *m_pszDefaultValue; [0x18]
+char *m_pszString; [0x1C]
 ```
 
 In this bug, we're targeting `m_pszString` so that our crafted pointer lands directly on `m_pszString`. When the bug calls our function, it will believe that `&m_pszString` is the location of the object's pointer, and `m_pszString` will contain its vtable pointer. The engine will now believe that any value inside of `m_pszString` for the ConVar will be part of the object's structure. Then, it will call a function pointer at `*((*m_pszString)+0x1C)`. As long as the `ConVar` on the client is marked as `FCVAR_REPLICATED`, the server can set its value arbitrarily, giving us full control over the contents of `m_pszString`. If we point the vtable pointer to the right place, this will give us control over the instruction pointer!
@@ -541,7 +541,7 @@ Anyways, he is the full step-by-step detail of the full chain and how both bugs 
 
 And there you have it. This entire exploitation happens automatically, and does so by using Frida to inject into the dedicated server process to instrument to do all of the steps above. This is quite involved, but the result is pretty awesome! Here's a video of the full PoC in action, be sure to full screen it so it's easier to see:
 
-<video controls>
+<video controls width="850">
   <source type="video/mp4" src="https://ctf.re/static/packetentities_exploit_full.mp4">
 </video>
 
