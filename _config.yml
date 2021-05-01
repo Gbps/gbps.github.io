@@ -129,3 +129,8 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - vendor
+
+# Kramdown disable syntax highlighting for use with Prism
+kramdown:
+  syntax_highlighter_opts:
+    disable : true
