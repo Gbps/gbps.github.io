@@ -3,7 +3,7 @@ layout:     post
 title:      Exploiting the Source Engine (Part 2) - Full-Chain Client RCE in Source using Frida
 date:       2021-05-01
 summary: Exploiting a clientside RCE using a two-step bug chain utilizing Frida.RE
-categories: source-engine exploitation reverse-engineering frida hackerone bug-bounty
+categories: source-engine exploitation
 typora-copy-images-to: ../assets
 typora-root-url: ../../gbps.github.io
 ---
