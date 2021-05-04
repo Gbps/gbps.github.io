@@ -575,6 +575,8 @@ Exploit PoC and the map hacking Python script referenced in this post are availa
 
 [https://github.com/Gbps/sourceengine-packetentities-rce-poc](https://github.com/Gbps/sourceengine-packetentities-rce-poc)
 
+For the Frida exploit chain: [https://github.com/Gbps/sourceengine-packetentities-rce-poc/tree/master/src/agent](https://github.com/Gbps/sourceengine-packetentities-rce-poc/tree/master/src/agent)
+
 But sure to give it a ⭐ if you liked it!
 
 ## Final thoughts
