@@ -579,7 +579,7 @@ But sure to give it a ⭐ if you liked it!
 
 ## Final thoughts
 
-This chain was super fun to develop, and the constraints I placed on myself made the exploit way more interesting than my first submission. While I wasn't super stoked about getting only 1/6th of the bounty of my trivial stack-based overflow submission prior, especially after a year of waiting, I'm glad that the report finally went through so I could publish the information for everyone to read. It really goes to show that even a fairly simple set of bugs on paper can turn into a complex exploitation effort quickly when targeting big software applications. But, doing so helps you develop skills that you might not necessarily pick up from simple CTF problems. 
+This chain was super fun to develop, and the constraints I placed on myself made the exploit way more interesting than my first submission. I'm glad that the report finally went through so I could publish the information for everyone to read. It really goes to show that even a fairly simple set of bugs on paper can turn into a complex exploitation effort quickly when targeting big software applications. But, doing so helps you develop skills that you might not necessarily pick up from simple CTF problems. 
 
 Incorporating the Frida project definitely reinvigorated my drive to continue poking and testing PoCs for bugs, as the process for scripting up examples was much nicer than before. I hope to spend some time in a future post to discuss more ways to utilize Frida on the desktop, and also hope to publish my ret-sync Frida plugin in an official capacity on my [GitHub](https://github.com/Gbps/) soon.
 
