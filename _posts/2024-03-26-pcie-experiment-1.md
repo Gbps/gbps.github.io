@@ -5,10 +5,7 @@ date:       2024-03-26
 summary:    Using a PCIe Protocol Analyzer to dump simple DMA packets/TLPs over a PCIe link using the pcileech project
 categories: pcie experiment linux keysight protocol-analyzer
 ---
-
-# Experiment - Packet Dumping PCIe DMA TLPs with a Protocol Analyzer and Pcileech
-
-## Introduction
+# Introduction
 
 In this post, I will be going over a small experiment where we hook up a PCIe device capable of performing arbitrary DMA to a Keysight PCIe 3.0 Protocol Analyzer to intercept and observe the Transaction Layer Packets (TLPs) that travel over the link. The purpose of this experiment is to develop a solid understanding of how memory transfer takes place under PCIe.
 
@@ -17,7 +14,7 @@ This is post is part of a series on PCIe for beginners. I encourage you to read 
 - [Part 1](https://ctf.re/windows/kernel/pcie/tutorial/2023/02/14/pcie-part-1/)
 - Part 2
 
-## Background: On Why PCIe Hardware is so Unapproachable
+# Background: On Why PCIe Hardware is so Unapproachable
 
 There are a couple recurring themes of working with PCIe that make it exceptionally difficult for beginners: black boxes and cost. Unlike tons of technologies we use today in computing, PCIe is mostly a "industry only" club. Generally, if you do not or have not worked directly in the industry with it, it is unlikely that you will have access to the information and tools necessary to work with it. This is not so much a gatekeeping issue as much as it is that the field serves a niche purpose and the hardware components needed to work with it are generally prohibitively expensive for a single individual.
 
@@ -33,7 +30,7 @@ But, all is not lost. Due to a fairly healthy secondhand market for electronics 
 
 It should be noted that these protocol analyzers can analyze each of the three layers of the PCIe link stack: the Physical, Data Link, and Transaction layer. If you're not specifically designing something focused within the Physical or Data Link layer, these captures are not nearly as important as the Transaction layer. It is impossible for a PC platform to "dump" PCIe traffic like network or USB traffic. The cost of adding such a functionality would well outweigh the benefit.
 
-## My New PCIe 3.0 Protocol Analyzer Setup
+# My New PCIe 3.0 Protocol Analyzer Setup
 
 After a year or so of looking, I was finally lucky enough to find all of the necessary pieces for a PCIe 3.0 Protocol Analyzer on Ebay at the same time, so I took the risk and purchased each of these components for myself (for what I believe was a fantastic deal compared to even the used market). I believe I was able to find these devices listed at all because they were approaching about a decade old and, at max, support PCIe 3.0. As newer devices are quickly moving to 4.0 and above, I can guess that this analyzer was probably from a lab that has recently upgraded to a newer spec. This however does not diminish the usefulness of a 3.0 analyzer, as all devices of a higher spec are backwards compatible with older speeds and still a huge swath of devices on the market in 2024 are still PCIe 3.0. NVMe SSDs and consumer GFX cards have been moving to 4.0 for the enhanced speed, but they still use the same feature set as 3.0. Most newer features are reserved for the server space.
 
@@ -70,7 +67,7 @@ Here is a listing of my setup, with the exact component identifiers and listings
 
 <center><i>Shown: My U4301A Analyzer hooked up to my host machine</i></center>
 
-## FPGA Setup for DMA with Pcileech
+# FPGA Setup for DMA with Pcileech
 
 It's totally possible to connect an arbitrary PCIe device, such as a graphics card, and capture its DMA for this experiment. However, I think it's much nicer to create the experiment by being able to issue arbitrary DMA from a device and observing its communication under the analyzer. That way there's not a lot of chatter from the regular device's operation happening on the link that affects the results.
 
@@ -186,7 +183,7 @@ We can also verify the same bytes of data were returned through a raw hex dump o
 
 # Experiment - Performing and Viewing DMA to System RAM
 
-### Setup
+## Setup
 
 For the final experiment, let's do some DMA from our FPGA device to the target system! We will do this by using pcileech to send a request to read an address and length and observing the resulting data from RAM sent from the AMD Zen 3 system back to the device.
 
@@ -331,7 +328,7 @@ Where:
 - `-min 0x1000` specifies to start dumping memory from this address
 - `-max 0x2000`  specifies to stop dumping memory at this address. This results in 0x1000 bytes being read from the device.
 
-### Analyzer Output
+## Analyzer Output
 
 ![image-20240325175450050](/assets/PCIe_Experiment_1/image-20240325175450050.png)
 
@@ -395,7 +392,7 @@ It is not clear what from the platform or OS level at this exact moment has redu
 
 And there you have it, a more in-depth look into how a device performs DMA!
 
-## Summary
+# Summary
 
 This simple experiment hopefully gives you a nicer look into the "black box" of the PCIe link. While it's nice to see diagrams, I think it's much sweeter to look into actual packets on the wire to confirm that your understanding is what actually happens in practice. 
 
