@@ -78,7 +78,7 @@ For this experiment, I'm using the fantastic [Pcileech project](https://github.c
 
 If you are not aware, FPGA stands for [**Field-Programmable Gate Array**](https://en.wikipedia.org/wiki/Field-programmable_gate_array). It is essentially a chip that can have all of its digital logic elements reprogrammed at runtime. This allows a hardware designer to create and change hardware on the fly. The development boards for these FPGAs typically have lots of high and low speed I/O interfaces that the chip could be programmed to communicate to. Many boards support PCIe, so this is great for working with high speed links that cannot be handled by your standard microcontroller.
 
-![Artix -7 FPGAs - Xilinx | Mouser](/assets/PCIe_Experiment_1/148373317.png)
+![Artix -7 FPGA](/assets/PCIe_Experiment_1/148373317.png)
 
 <center><i>Image © Advanced Micro Devices, Inc</i></center>
 
