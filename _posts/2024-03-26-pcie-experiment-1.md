@@ -2,7 +2,7 @@
 layout:     post
 title:      Experiment - Packet Dumping PCIe DMA TLPs with a Protocol Analyzer and Pcileech
 date:       2024-03-26
-summary:    Using a PCIe Protocol Analyzer to look at simple pcileech DMA packets over a PCIe link
+summary:    Using a PCIe Protocol Analyzer to dump simple DMA packets/TLPs over a PCIe link using the pcileech project
 categories: pcie experiment linux keysight protocol-analyzer
 ---
 
@@ -41,30 +41,30 @@ Finding historical pricing information for these devices and cards is nearly imp
 
 Here is a listing of my setup, with the exact component identifiers and listings that were necessary to work together. If you were to purchase one of these, I do recommend this setup. Note that cables and cards similar but not exactly the same identifiers might not be compatible, so be exact!
 
-- [Agilent/Keysight U4301A PCI Express Protocol Analyzer Module](https://www.ebay.com/itm/222998757531) - $1,800 USD (bundled with below)
+- [Agilent/Keysight U4301A PCI Express Protocol Analyzer Module](https://www.ebay.com/itm/222998757531) - **$1,800 USD** (bundled with below)
   - This is the actual analyzer module from Agilent that supports PCIe 3.0. This device is similar to a 1U server that must rack into a U4002A Digital Tester Chassis or a M9502A Chassis.
   - The module comes installed with its software license on board. You do not need to purchase a separate license for its functionality.
   - I used the latest edition of Windows 11 for the software.
   - This single module can support up to 8 lanes of upstream and downstream at the same time. Two modules in a chassis would be required for 16 lanes of upstream and downstream.
   - https://www.keysight.com/us/en/product/U4301A/pcie-analyzer.html
 
-- [Agilent/Keysight U4002A Digital Tester Chassis ](https://www.ebay.com/itm/222998757531) -  $1,800 USD (bundled with above)
+- [Agilent/Keysight U4002A Digital Tester Chassis ](https://www.ebay.com/itm/222998757531) -  **$1,800 USD** (bundled with above)
   - This is the chassis that the analyzer module racks into. The chassis has an embedded controller module on it at the bottom which will be the component that hooks up to the PC. This is in charge of controlling the U4301A module and collects and manages its data for sending back to the PC.
 
-- [One Stop Systems OSS Host PCIe Card 7030-30048-01 A](https://www.ebay.com/itm/265603804014) - $8 USD
+- [One Stop Systems OSS Host PCIe Card 7030-30048-01 A](https://www.ebay.com/itm/265603804014) - **$8 USD**
   - The host card that slots into a PCIe slot on the host PC's motherboard. The cord and card should be plugged in and the module powered on for at least 4 minutes prior to booting the host PC.
 
-- [Molex 74546-0403 PCIe x4 iPass Cable](https://www.ebay.com/itm/186166833555) - $15.88 USD
+- [Molex 74546-0403 PCIe x4 iPass Cable](https://www.ebay.com/itm/186166833555) - **$15.88 USD**
   - The cord that connects the embedded controller module in the chassis to the PC through the OSS Host PCIe card.
 
-- [Agilent/Keysight U4321 -66408 PCIe Interposer Probe Card With Cables And Adapter](https://www.ebay.com/itm/374968718221) - $1,850 USD
+- [Agilent/Keysight U4321 -66408 PCIe Interposer Probe Card With Cables And Adapter](https://www.ebay.com/itm/374968718221) - **$1,850 USD**
   - This is the interposer card that sits between the device under test and the slot on the target machine. This card is powered by a 12V DC power brick.
   - This is an x8 card, so it can at the max support 8 lanes of PCIe. Devices under test will negotiate down to 8 lanes if needed, so this is not an isssue.
   - https://www.keysight.com/us/en/product/U4321A/pcie-interposer-probe.html
 
 - At least 2x **U4321-61601** Solid Slot Interposer Cables are needed to attach to the U4321. 4x are needed for bidirectional x8 connection. These were bundled along with the above.
 
-- Total Damage: Roughly ~$4000 USD.
+- Total Damage: Roughly **~$4000 USD**.
 
 ![image-20240326142902108](/assets/PCIe_Experiment_1/image-20240326142902108.png)
 
